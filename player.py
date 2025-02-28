@@ -11,23 +11,8 @@ class Player(GameObject):
         pub.subscribe(self.input_event, 'input')
 
     def input_event(self, events=None):
-        # TODO: this needs to interact with the physics object
-        # to move the player in the right direction.  We cannot
-        # just teleport the player to the new position like we
-        # did before.
-        if events:
-            if 'moveForward' in events:
-                pass
-
-            if 'moveBackward' in events:
-                pass
-
-            if 'moveLeft' in events:
-                pass
-
-            if 'moveRight' in events:
-                pass
-
+        # TODO: this will need to handle non-FPS movement events
+        pass
 
     def collision(self, other):
         # TODO: the physics engine needs to detect the
