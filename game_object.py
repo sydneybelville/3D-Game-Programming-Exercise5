@@ -1,5 +1,6 @@
 class GameObject:
-    def __init__(self, position, kind, id, size):
+    def __init__(self, position, kind, id, size, physics):
+        self.physics = physics
         self.position = position
         self.kind = kind
         self.id = id
