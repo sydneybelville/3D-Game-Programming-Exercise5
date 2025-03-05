@@ -5,13 +5,16 @@ from game_object import GameObject
 from player import Player
 
 class GameWorld:
-    def __init__(self):
+    def __init__(self, debugNode=None):
         self.properties = {}
         self.game_objects = {}
 
         self.next_id = 0
         self.physics_world = BulletWorld()
         self.physics_world.setGravity(Vec3(0, 0, -9.81))
+
+        if debugNode:
+            self.physics_world.setDebugNode(debugNode)
 
         self.kind_to_shape = {
             "player": self.create_capsule,
@@ -67,6 +70,7 @@ class GameWorld:
     def load_world(self):
         self.create_object([0, 0, 0], "crate", (5,2,1), 10, GameObject)
         self.create_object([0, -20, 0], "player", (0.1, 0.8, 1), 10, Player)
+        self.create_object([0, 0, -10], "crate", (50, 50, 1), 0, GameObject)
 
     def get_property(self, key):
         if key in self.properties:
