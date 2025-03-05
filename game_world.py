@@ -17,7 +17,6 @@ class GameWorld:
             self.physics_world.setDebugNode(debugNode)
 
         self.kind_to_shape = {
-            "player": self.create_capsule,
             "crate": self.create_box,
             "red_box": self.create_box,
             "enemy": self.create_capsule,
@@ -49,7 +48,7 @@ class GameWorld:
         if kind in self.kind_to_shape:
             return self.kind_to_shape[kind](position, size, kind, mass)
 
-        raise ValueError(f"create_physics_object, did not find {kind} in dictionary")
+        return None
 
     def create_object(self, position, kind, size, mass, subclass):
         physics = self.create_physics_object(position, kind, size, mass)
@@ -70,7 +69,7 @@ class GameWorld:
     def load_world(self):
         self.create_object([0, 0, 0], "crate", (5,2,1), 10, GameObject)
         self.create_object([0, -20, 0], "player", (0.1, 0.8, 1), 10, Player)
-        self.create_object([0, 0, -10], "crate", (50, 50, 1), 0, GameObject)
+        self.create_object([0, 0, -5], "crate", (1000, 1000, 0.5), 0, GameObject)
 
     def get_property(self, key):
         if key in self.properties:
