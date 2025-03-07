@@ -4,10 +4,11 @@ from direct.showbase.ShowBaseGlobal import globalClock
 from direct.task import Task
 from panda3d.bullet import BulletDebugNode
 from panda3d.core import CollisionNode, GeomNode, CollisionRay, CollisionHandlerQueue, CollisionTraverser, MouseButton, \
-    WindowProperties, Quat
+    WindowProperties, Quat, Vec3
 from pubsub import pub
 import sys
 
+from kcc import PandaBulletCharacterController
 from world_view import WorldView
 from game_world import GameWorld
 
@@ -15,6 +16,7 @@ controls = {
     'escape': 'toggleMouseMove',
     't': 'toggleTexture',
     'mouse1': 'toggleTexture',
+    'space': 'jump',
 }
 
 held_keys = {
@@ -29,6 +31,7 @@ class Main(ShowBase):
         self.cTrav = CollisionTraverser()
 
         self.game_world.load_world()
+        self.player = PandaBulletCharacterController(self.game_world.physics_world, self.render, self.player)
 
         picker_node = CollisionNode('mouseRay')
         picker_np = self.camera.attachNewNode(picker_node)
@@ -72,6 +75,27 @@ class Main(ShowBase):
     def input_event(self, event):
         self.input_events[event] = True
 
+    def move_player(self, events=None):
+        speed = Vec3(0, 0, 0)
+        delta = 5.0
+
+        if inputState.isSet("moveForward"):
+            speed.setY(delta)
+
+        if inputState.isSet("moveBackward"):
+            speed.setY(-delta)
+
+        if inputState.isSet("moveLeft"):
+            speed.setX(-delta)
+
+        if inputState.isSet("moveRight"):
+            speed.setX(delta)
+
+        if 'jump' in events:
+            self.player.startJump(2)
+
+        self.player.setLinearMovement(speed)
+
     def tick(self, task):
         if 'toggleMouseMove' in self.input_events:
             if self.CursorOffOn == 'Off':
@@ -84,6 +108,7 @@ class Main(ShowBase):
             self.win.requestProperties(self.props)
 
         pub.sendMessage('input', events=self.input_events)
+        self.move_player(self.input_events)
 
         picked_object = self.get_nearest_object()
         if picked_object:
@@ -107,9 +132,7 @@ class Main(ShowBase):
                 self.player.z_rotation = z_rotation
                 self.player.x_rotation = x_rotation
 
-        h = self.player.z_rotation
-        p = self.player.x_rotation
-        r = self.player.y_rotation
+        h, p, r = self.player.getHpr()
         self.camera.setHpr(h, p, r)
 
         # This seems to work to prevent seeing into objects the player collides with.
@@ -120,8 +143,8 @@ class Main(ShowBase):
         delta_x = -forward[0]
         delta_y = -forward[1]
         delta_z = -forward[2]
-        x, y, z = self.player.position
-        z_adjust = self.player.size[1]/2
+        x, y, z = self.player.getPos()
+        z_adjust = self.player.game_object.size[1]/2
         distance_factor = 0.5
         self.camera.set_pos(x + delta_x*distance_factor, y + delta_y*distance_factor, z + delta_z*distance_factor + z_adjust)
 
