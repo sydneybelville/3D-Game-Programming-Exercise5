@@ -1,10 +1,9 @@
-from direct.showbase.InputStateGlobal import inputState
 from direct.showbase.ShowBase import ShowBase
-from direct.showbase.ShowBaseGlobal import globalClock
 from direct.task import Task
 from panda3d.bullet import BulletDebugNode
 from panda3d.core import CollisionNode, GeomNode, CollisionRay, CollisionHandlerQueue, CollisionTraverser, MouseButton, \
     WindowProperties, Quat, Vec3
+from direct.showbase.InputStateGlobal import inputState
 from pubsub import pub
 import sys
 
@@ -14,7 +13,7 @@ from game_world import GameWorld
 
 controls = {
     'escape': 'toggleMouseMove',
-    't': 'toggleTexture',
+    't': 'teleport',
     'mouse1': 'toggleTexture',
     'space': 'jump',
 }
@@ -58,6 +57,8 @@ class Main(ShowBase):
         self.props.setCursorHidden(True)
         self.win.requestProperties(self.props)
 
+        self.camera_pitch = 0
+
         self.run()
 
     def get_nearest_object(self):
@@ -74,27 +75,6 @@ class Main(ShowBase):
 
     def input_event(self, event):
         self.input_events[event] = True
-
-    def move_player(self, events=None):
-        speed = Vec3(0, 0, 0)
-        delta = 5.0
-
-        if inputState.isSet("moveForward"):
-            speed.setY(delta)
-
-        if inputState.isSet("moveBackward"):
-            speed.setY(-delta)
-
-        if inputState.isSet("moveLeft"):
-            speed.setX(-delta)
-
-        if inputState.isSet("moveRight"):
-            speed.setX(delta)
-
-        if 'jump' in events:
-            self.player.startJump(2)
-
-        self.player.setLinearMovement(speed)
 
     def tick(self, task):
         if 'toggleMouseMove' in self.input_events:
@@ -115,8 +95,6 @@ class Main(ShowBase):
             picked_object.selected()
 
         if self.CursorOffOn == 'Off':
-            # TODO: camera mouse rotation needs to work with the physics object
-            # we only want z rotations translated to the player.
             md = self.win.getPointer(0)
             x = md.getX()
             y = md.getY()
@@ -129,10 +107,12 @@ class Main(ShowBase):
                 if (x_rotation >= 90.1):
                     x_rotation = 90
 
-                self.player.z_rotation = z_rotation
-                self.player.x_rotation = x_rotation
+                self.player.setH(z_rotation)
+                self.camera_pitch = x_rotation
 
-        h, p, r = self.player.getHpr()
+        h = self.player.getH()
+        p = self.camera_pitch
+        r = self.player.getR()
         self.camera.setHpr(h, p, r)
 
         # This seems to work to prevent seeing into objects the player collides with.
@@ -144,12 +124,15 @@ class Main(ShowBase):
         delta_y = -forward[1]
         delta_z = -forward[2]
         x, y, z = self.player.getPos()
-        z_adjust = self.player.game_object.size[1]/2
         distance_factor = 0.5
-        self.camera.set_pos(x + delta_x*distance_factor, y + delta_y*distance_factor, z + delta_z*distance_factor + z_adjust)
+        z_adjust = self.player.game_object.size[0]
+        # self.camera.set_pos(x + delta_x*distance_factor, y + delta_y*distance_factor, z + z_adjust)
+        self.camera.set_pos(x, y, z + z_adjust)
 
-        self.game_world.tick(globalClock.getDt())
-        self.player_view.tick()
+        dt = globalClock.getDt()
+        self.player.update(dt)
+        self.game_world.tick(dt)
+        self.world_view.tick()
 
         if self.game_world.get_property("quit"):
             sys.exit()
@@ -163,6 +146,27 @@ class Main(ShowBase):
 
         self.player = game_object
 
+    def move_player(self, events=None):
+        speed = Vec3(0, 0, 0)
+        delta = 5.0
+
+        if inputState.isSet('moveForward'):
+            speed.setY(delta)
+
+        if inputState.isSet('moveBackward'):
+            speed.setY(-delta)
+
+        if inputState.isSet('moveLeft'):
+            speed.setX(-delta)
+
+        if inputState.isSet('moveRight'):
+            speed.setX(delta)
+
+        if 'jump' in events:
+            self.player.startJump(2)
+
+        self.player.setLinearMovement(speed)
+
     def __init__(self):
         ShowBase.__init__(self)
 
@@ -173,7 +177,6 @@ class Main(ShowBase):
         self.player = None
         pub.subscribe(self.new_player_object, 'create')
 
-        # Debug visualization for physics objects
         debugNode = BulletDebugNode('Debug')
         debugNode.showWireframe(True)
         debugNode.showConstraints(True)
@@ -184,7 +187,7 @@ class Main(ShowBase):
 
         # create model and view
         self.game_world = GameWorld(debugNode)
-        self.player_view = WorldView(self.game_world)
+        self.world_view = WorldView(self.game_world)
 
 
 if __name__ == '__main__':
