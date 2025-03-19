@@ -76,7 +76,7 @@ class Main(ShowBase):
     def input_event(self, event):
         self.input_events[event] = True
 
-    def forward(self, pos, distance, hpr):
+    def forward(self, hpr, pos, distance):
         h, p, r = hpr
         x, y, z = pos
         q = Quat()
@@ -85,7 +85,7 @@ class Main(ShowBase):
         delta_x = -forward[0]
         delta_y = -forward[1]
         delta_z = -forward[2]
-        return Point3(x + delta_x*distance, y + delta_y*distance, z + delta_z*distance)
+        return x + delta_x*distance, y + delta_y*distance, z + delta_z*distance
 
     def tick(self, task):
         if 'toggleMouseMove' in self.input_events:
@@ -101,7 +101,9 @@ class Main(ShowBase):
         pub.sendMessage('input', events=self.input_events)
         self.move_player(self.input_events)
 
-        picked_object = self.game_world.get_nearest(self.player.getPos(), self.forward(self.player.getPos(), 5, self.player.getHpr()))
+        # TODO: this doesn't seem to get reasonable values for the player position,
+        # with respect to the crates
+        picked_object = self.game_world.get_nearest(self.player.getPos(), self.forward(self.player.getHpr(), self.player.getPos(), 5))
         print(f"----picked node: {picked_object.getNode()}")
         if picked_object and picked_object.getNode():
             picked_object.getNode().selected()

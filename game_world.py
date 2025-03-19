@@ -1,5 +1,5 @@
 from panda3d.bullet import BulletWorld, BulletBoxShape, BulletRigidBodyNode, BulletCapsuleShape, ZUp
-from panda3d.core import Vec3, VBase3, TransformState
+from panda3d.core import Vec3, VBase3, TransformState, Point3
 from pubsub import pub
 from game_object import GameObject
 from player import Player
@@ -81,6 +81,8 @@ class GameWorld:
         self.properties[key] = value
 
     def get_nearest(self, from_pt, to_pt):
+        fx, fy, fz = from_pt
+        tx, ty, tz = to_pt
         print(f"get nearest {from_pt} to {to_pt}")
-        result = self.physics_world.rayTestClosest(from_pt, to_pt)
+        result = self.physics_world.rayTestClosest(Point3(fx, fy, fz), Point3(tx, ty, tz))
         return result
