@@ -103,6 +103,9 @@ class Main(ShowBase):
 
         # TODO: this doesn't seem to get reasonable values for the player position,
         # with respect to the crates
+        # The player position is okay at first, but at the first movement it zeroes out
+        print(f"Player position (kcc): {self.player.getPos()}")
+        print(f"Player position (game): {self.player.game_object.position}")
         picked_object = self.game_world.get_nearest(self.player.getPos(), self.forward(self.player.getHpr(), self.player.getPos(), 5))
         print(f"----picked node: {picked_object.getNode()}")
         if picked_object and picked_object.getNode():

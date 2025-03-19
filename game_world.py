@@ -83,6 +83,5 @@ class GameWorld:
     def get_nearest(self, from_pt, to_pt):
         fx, fy, fz = from_pt
         tx, ty, tz = to_pt
-        print(f"get nearest {from_pt} to {to_pt}")
         result = self.physics_world.rayTestClosest(Point3(fx, fy, fz), Point3(tx, ty, tz))
         return result
