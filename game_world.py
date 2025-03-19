@@ -79,3 +79,8 @@ class GameWorld:
 
     def set_property(self, key, value):
         self.properties[key] = value
+
+    def get_nearest(self, from_pt, to_pt):
+        print(f"get nearest {from_pt} to {to_pt}")
+        result = self.physics_world.rayTestClosest(from_pt, to_pt)
+        return result

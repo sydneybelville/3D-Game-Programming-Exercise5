@@ -2,7 +2,7 @@ from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from panda3d.bullet import BulletDebugNode
 from panda3d.core import CollisionNode, GeomNode, CollisionRay, CollisionHandlerQueue, CollisionTraverser, MouseButton, \
-    WindowProperties, Quat, Vec3
+    WindowProperties, Quat, Vec3, Point3
 from direct.showbase.InputStateGlobal import inputState
 from pubsub import pub
 import sys
@@ -76,6 +76,17 @@ class Main(ShowBase):
     def input_event(self, event):
         self.input_events[event] = True
 
+    def forward(self, pos, distance, hpr):
+        h, p, r = hpr
+        x, y, z = pos
+        q = Quat()
+        q.setHpr((h, p, r))
+        forward = q.getForward()
+        delta_x = -forward[0]
+        delta_y = -forward[1]
+        delta_z = -forward[2]
+        return Point3(x + delta_x*distance, y + delta_y*distance, z + delta_z*distance)
+
     def tick(self, task):
         if 'toggleMouseMove' in self.input_events:
             if self.CursorOffOn == 'Off':
@@ -90,9 +101,10 @@ class Main(ShowBase):
         pub.sendMessage('input', events=self.input_events)
         self.move_player(self.input_events)
 
-        picked_object = self.get_nearest_object()
-        if picked_object:
-            picked_object.selected()
+        picked_object = self.game_world.get_nearest(self.player.getPos(), self.forward(self.player.getPos(), 5, self.player.getHpr()))
+        print(f"----picked node: {picked_object.getNode()}")
+        if picked_object and picked_object.getNode():
+            picked_object.getNode().selected()
 
         if self.CursorOffOn == 'Off':
             md = self.win.getPointer(0)

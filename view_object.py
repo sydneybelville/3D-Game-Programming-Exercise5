@@ -48,7 +48,7 @@ class ViewObject:
         self.cube.setPythonTag("owner", None)
 
     def toggle_texture(self, events=None):
-        if 'toggleTexture' in events:
+        if self.is_selected and 'toggleTexture' in events:
             self.toggle_texture_pressed = True
 
     def selected(self):
