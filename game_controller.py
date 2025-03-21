@@ -32,16 +32,6 @@ class Main(ShowBase):
         self.game_world.load_world()
         self.player = PandaBulletCharacterController(self.game_world.physics_world, self.render, self.player)
 
-        picker_node = CollisionNode('mouseRay')
-        picker_np = self.camera.attachNewNode(picker_node)
-        picker_node.setFromCollideMask(GeomNode.getDefaultCollideMask())
-        picker_node.set_into_collide_mask(0)
-        self.pickerRay = CollisionRay()
-        picker_node.addSolid(self.pickerRay)
-        # picker_np.show()
-        self.rayQueue = CollisionHandlerQueue()
-        self.cTrav.addCollider(picker_np, self.rayQueue)
-
         self.taskMgr.add(self.tick)
 
         self.input_events = {}
@@ -98,14 +88,10 @@ class Main(ShowBase):
         self.move_player(self.input_events)
 
         # This is getting the panda rigid body node.  Need to go from that
-        # to the game object.
+        # to the game object using the 'owner' tag that's set when the
+        # game object is created.
         picked_object = self.game_world.get_nearest(self.player.getPos(), self.forward(self.player.getHpr(), self.player.getPos(), 5))
-        # print(f"----picked node: {picked_object.getNode()}")
         if picked_object and picked_object.getNode() and picked_object.getNode().getPythonTag("owner"):
-            # TODO: move the selected bit to game object
-            # and remove python tags from view object since we
-            # aern't using those.  Also remove the raycaster
-            # from the controller since that isn't being used either
             picked_object.getNode().getPythonTag("owner").selected()
 
         if self.CursorOffOn == 'Off':

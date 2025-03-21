@@ -67,7 +67,7 @@ class GameWorld:
         self.physics_world.do_physics(dt)
 
     def load_world(self):
-        self.create_object([0, 0, -5], "crate", (5,2,1), 0, GameObject)
+        self.create_object([0, 0, 0], "crate", (5,2,1), 10, GameObject)
         self.create_object([0, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
         self.create_object([0, 0, -5], "crate", (1000, 1000, 0.5), 0, GameObject)
 
@@ -81,7 +81,15 @@ class GameWorld:
         self.properties[key] = value
 
     def get_nearest(self, from_pt, to_pt):
+        # This shows the technique of near object detection using the physics engine.
         fx, fy, fz = from_pt
         tx, ty, tz = to_pt
         result = self.physics_world.rayTestClosest(Point3(fx, fy, fz), Point3(tx, ty, tz))
         return result
+
+    # TODO: use this to demonstrate a teleporting trap
+    def get_all_contacts(self, game_object):
+        if game_object.physics:
+            return self.physics_world.contactTest(game_object.physics).getContacts()
+
+        return []
