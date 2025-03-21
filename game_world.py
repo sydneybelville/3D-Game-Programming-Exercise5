@@ -67,7 +67,7 @@ class GameWorld:
         self.physics_world.do_physics(dt)
 
     def load_world(self):
-        self.create_object([0, 0, 0], "crate", (5,2,1), 10, GameObject)
+        self.create_object([0, 0, -5], "crate", (5,2,1), 0, GameObject)
         self.create_object([0, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
         self.create_object([0, 0, -5], "crate", (1000, 1000, 0.5), 0, GameObject)
 

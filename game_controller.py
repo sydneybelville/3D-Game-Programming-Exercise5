@@ -59,19 +59,15 @@ class Main(ShowBase):
 
         self.camera_pitch = 0
 
+        pub.subscribe(self.handle_input, 'input')
+
         self.run()
 
-    def get_nearest_object(self):
-        self.pickerRay.setFromLens(self.camNode, 0, 0)
-        if self.rayQueue.getNumEntries() > 0:
-            self.rayQueue.sortEntries()
-            entry = self.rayQueue.getEntry(0)
-            picked_np = entry.getIntoNodePath()
-            picked_np = picked_np.findNetTag('selectable')
-            if not picked_np.isEmpty() and picked_np.getPythonTag("owner"):
-                return picked_np.getPythonTag("owner")
-
-        return None
+    def handle_input(self, events=None):
+        # Simple place to put debug outputs so they only happen on a click
+        if 'toggleTexture' in events:
+            print(f"Player position: {self.player.getPos()}")
+            print(f"Forward position: {self.forward(self.player.getHpr(), self.player.getPos(), 5)}")
 
     def input_event(self, event):
         self.input_events[event] = True
@@ -82,9 +78,9 @@ class Main(ShowBase):
         q = Quat()
         q.setHpr((h, p, r))
         forward = q.getForward()
-        delta_x = -forward[0]
-        delta_y = -forward[1]
-        delta_z = -forward[2]
+        delta_x = forward[0]
+        delta_y = forward[1]
+        delta_z = forward[2]
         return x + delta_x*distance, y + delta_y*distance, z + delta_z*distance
 
     def tick(self, task):
@@ -101,15 +97,16 @@ class Main(ShowBase):
         pub.sendMessage('input', events=self.input_events)
         self.move_player(self.input_events)
 
-        # TODO: this doesn't seem to get reasonable values for the player position,
-        # with respect to the crates
-        # The player position is okay at first, but at the first movement it zeroes out
-        print(f"Player position (kcc): {self.player.getPos()}")
-        print(f"Player position (game): {self.player.game_object.position}")
+        # This is getting the panda rigid body node.  Need to go from that
+        # to the game object.
         picked_object = self.game_world.get_nearest(self.player.getPos(), self.forward(self.player.getHpr(), self.player.getPos(), 5))
-        print(f"----picked node: {picked_object.getNode()}")
-        if picked_object and picked_object.getNode():
-            picked_object.getNode().selected()
+        # print(f"----picked node: {picked_object.getNode()}")
+        if picked_object and picked_object.getNode() and picked_object.getNode().getPythonTag("owner"):
+            # TODO: move the selected bit to game object
+            # and remove python tags from view object since we
+            # aern't using those.  Also remove the raycaster
+            # from the controller since that isn't being used either
+            picked_object.getNode().getPythonTag("owner").selected()
 
         if self.CursorOffOn == 'Off':
             md = self.win.getPointer(0)
