@@ -75,15 +75,15 @@ class GameWorld:
 
         self.physics_world.doPhysics(dt)
 
-        # for id in self.game_objects:
-        #     if self.game_objects[id].is_collision_source:
-        #         contacts = self.get_all_contacts(self.game_objects[id])
-        #
-        #         for contact in contacts:
-        #             if contact.getNode0() and contact.getNode0().getPythonTag("owner"):
-        #                 # Notify both objects about the collision
-        #                 contact.getNode0().getPythonTag("owner").collision(self.game_objects[id])
-        #                 self.game_objects[id].collision(contact.getNode0().getPythonTag("owner"))
+        for id in self.game_objects:
+            if self.game_objects[id].is_collision_source:
+                contacts = self.get_all_contacts(self.game_objects[id])
+
+                for contact in contacts:
+                    if contact.getNode0() and contact.getNode0().getPythonTag("owner"):
+                        # Notify both objects about the collision
+                        contact.getNode0().getPythonTag("owner").collision(self.game_objects[id])
+                        self.game_objects[id].collision(contact.getNode0().getPythonTag("owner"))
 
     def load_world(self):
         self.create_object([3, 0, 0], "crate", (5, 2, 1), 10, GameObject)

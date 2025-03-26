@@ -9,10 +9,6 @@ class Player(GameObject):
         self.speed = 0.1
 
         pub.subscribe(self.input_event, 'input')
-        pub.subscribe(self.kcc_object, 'kcc_object')
-
-    def kcc_object(self, physics=None):
-        self.physics = physics
 
     def input_event(self, events=None):
         pass
@@ -22,3 +18,11 @@ class Player(GameObject):
         # collision and call this function
         pass
 
+    # Override these and don't defer to the physics object
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, value):
+        self._position = value

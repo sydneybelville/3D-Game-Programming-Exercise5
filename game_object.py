@@ -4,7 +4,6 @@ from panda3d.core import TransformState, VBase3
 class GameObject:
     def __init__(self, position, kind, id, size, physics):
         # Needed to initialize self._physics for the if check in the setter
-        self._physics = None
         self.physics = physics
         self.position = position
         self.kind = kind
@@ -17,20 +16,16 @@ class GameObject:
         self.is_selected = False
         self.is_collision_source = False
 
+        if self.physics:
+            self.physics.setPythonTag("owner", self)
+
     @property
     def physics(self):
         return self._physics
 
     @physics.setter
     def physics(self, value):
-        # Store a reference back to the game object
-        if self._physics:
-            self._physics.setPythonTag("owner", None)
-
         self._physics = value
-
-        if self._physics:
-            self._physics.setPythonTag("owner", self)
 
     @property
     def size(self):
