@@ -112,7 +112,9 @@ class GameWorld:
     # TODO: use this to demonstrate a teleporting trap
     def get_all_contacts(self, game_object):
         # TODO: this doesn't work for the player since the physics object is
-        # created by the KCC.
+        # created by the KCC.  Will also need to think about how we get from the 
+        # KCC physics object back to the player game object for collisions with
+        # the player from other sources.
         if game_object.physics:
             return self.physics_world.contactTest(game_object.physics).getContacts()
 
