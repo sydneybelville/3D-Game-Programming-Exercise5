@@ -40,8 +40,7 @@ class ViewObject:
         pub.subscribe(self.toggle_texture, 'input')
 
     def deleted(self):
-        # Prevent circular references from keeping both the view object and the cube alive
-        self.cube.setPythonTag("owner", None)
+        pass
 
     def toggle_texture(self, events=None):
         if 'toggleTexture' in events:

@@ -12,6 +12,12 @@ class GameObject:
         self.z_rotation = 0
         self.size = size
 
+        self.is_selected = False
+
+        # Store a reference back to the game object
+        if physics:
+            self.physics.setPythonTag("owner", self)
+
     @property
     def physics(self):
         return self._physics
@@ -81,6 +87,9 @@ class GameObject:
     @z_rotation.setter
     def z_rotation(self, value):
         self._z_rotation = value
+
+    def selected(self):
+         self.is_selected = True
 
     def tick(self, dt):
         pass
