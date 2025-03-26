@@ -75,9 +75,20 @@ class GameWorld:
 
         self.physics_world.doPhysics(dt)
 
+        for id in self.game_objects:
+            if self.game_objects[id].is_collision_source:
+                contacts = self.get_all_contacts(self.game_objects[id])
+
+                for contact in contacts:
+                    if contact.getNode() and contact.getNode().getPythonTag("owner"):
+                        # Notify both objects about the collision
+                        contact.getNode().getPythonTag("owner").collision(self.game_objects[id])
+                        self.game_objects[id].collision(contact.getNode().getPythonTag("owner"))
+
     def load_world(self):
         self.create_object([3, 0, 0], "crate", (5, 2, 1), 10, GameObject)
-        self.create_object([0, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
+        player = self.create_object([0, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
+        player.is_collision_source = True
         self.create_object([0, 0, -5], "crate", (1000, 1000, 0.5), 0, GameObject)
 
     def get_property(self, key):
@@ -100,6 +111,8 @@ class GameWorld:
 
     # TODO: use this to demonstrate a teleporting trap
     def get_all_contacts(self, game_object):
+        # TODO: this doesn't work for the player since the physics object is
+        # created by the KCC.
         if game_object.physics:
             return self.physics_world.contactTest(game_object.physics).getContacts()
 
