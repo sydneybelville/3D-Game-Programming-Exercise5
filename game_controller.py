@@ -1,4 +1,5 @@
 from direct.showbase.ShowBase import ShowBase
+from direct.showbase.ShowBaseGlobal import globalClock
 from direct.task import Task
 from panda3d.bullet import BulletDebugNode
 from panda3d.core import CollisionNode, GeomNode, CollisionRay, CollisionHandlerQueue, CollisionTraverser, MouseButton, \
