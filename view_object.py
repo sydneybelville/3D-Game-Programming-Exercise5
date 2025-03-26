@@ -15,7 +15,6 @@ class ViewObject:
         # game object's kind property to what type of model to use
         self.cube = base.loader.loadModel("Models/cube")
         self.cube.reparentTo(self.node_path)
-        self.cube.setPos(*game_object.position)
 
         # TODO: we don't always need a texture.  We need a
         # mechanism to see if we need a texture or color,
@@ -35,12 +34,14 @@ class ViewObject:
 
         self.cube.setScale(x_scale, y_scale, z_scale)
 
+        self.is_selected = False
         self.texture_on = True
         self.toggle_texture_pressed = False
         pub.subscribe(self.toggle_texture, 'input')
 
     def deleted(self):
-        pass
+        # Prevent circular references from keeping both the view object and the cube alive
+        self.cube.setPythonTag("owner", None)
 
     def toggle_texture(self, events=None):
         if 'toggleTexture' in events:
