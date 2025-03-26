@@ -9,6 +9,10 @@ class Player(GameObject):
         self.speed = 0.1
 
         pub.subscribe(self.input_event, 'input')
+        pub.subscribe(self.kcc_object, 'kcc_object')
+
+    def kcc_object(self, physics=None):
+        self.physics = physics
 
     def input_event(self, events=None):
         pass

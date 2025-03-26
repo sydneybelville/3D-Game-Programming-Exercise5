@@ -1,5 +1,6 @@
 from panda3d.core import Vec3, Point3, Quat, BitMask32
 from panda3d.bullet import BulletCapsuleShape, BulletRigidBodyNode, BulletGhostNode
+from pubsub import pub
 
 import math
 
@@ -49,6 +50,8 @@ class PandaBulletCharacterController:
         self.movementParent = self.__parent.attachNewNode("Movement Parent")
         self.__setup(walkHeight, crouchHeight, stepHeight, radius)
         self.__mapMethods()
+
+        pub.sendMessage('kcc_object', physics=self.__walkCapsuleNP.node())
 
         self.gravity = self.__world.getGravity().z if gravity is None else gravity
         self.setMaxSlope(50.0, True)
@@ -139,6 +142,7 @@ class PandaBulletCharacterController:
 
         self.__world.removeRigidBody(self.__walkCapsuleNP.node())
         self.__world.attachRigidBody(self.__crouchCapsuleNP.node())
+        pub.sendMessage('kcc_object', physics=self.__crouchCapsuleNP.node())
 
         self.__capsuleOffset = self.__capsuleH * 0.5 + self.__levitation
         self.__footDistance = self.__capsuleOffset + self.__levitation
@@ -264,6 +268,7 @@ class PandaBulletCharacterController:
 
         self.__world.removeRigidBody(self.__crouchCapsuleNP.node())
         self.__world.attachRigidBody(self.__walkCapsuleNP.node())
+        pub.sendMessage('kcc_object', physics=self.__walkCapsuleNP.node())
 
         self.__capsuleOffset = self.__capsuleH * 0.5 + self.__levitation
         self.__footDistance = self.__capsuleOffset + self.__levitation
