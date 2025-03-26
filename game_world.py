@@ -114,7 +114,9 @@ class GameWorld:
         # TODO: this doesn't work for the player since the physics object is
         # created by the KCC.  Will also need to think about how we get from the 
         # KCC physics object back to the player game object for collisions with
-        # the player from other sources.
+        # the player from other sources.  Would need the KCC to set the owner
+        # tag on the physics object to the game object.  But changes to the player
+        # game object won't be reflected in the KCC physics object.
         if game_object.physics:
             return self.physics_world.contactTest(game_object.physics).getContacts()
 
