@@ -4,6 +4,7 @@ from panda3d.core import Vec3, TransformState, VBase3, Point3
 from pubsub import pub
 from game_object import GameObject
 from player import Player
+from teleporter import Teleporter
 
 
 class GameWorld:
@@ -20,6 +21,7 @@ class GameWorld:
             "crate": self.create_box,
             "floor": self.create_box,
             "red box": self.create_box,
+            "teleporter": self.create_box,
         }
 
     def create_capsule(self, position, size, kind, mass):
@@ -73,20 +75,21 @@ class GameWorld:
         for id in self.game_objects:
             self.game_objects[id].tick(dt)
 
-        self.physics_world.doPhysics(dt)
-
         for id in self.game_objects:
             if self.game_objects[id].is_collision_source:
                 contacts = self.get_all_contacts(self.game_objects[id])
 
                 for contact in contacts:
-                    if contact.getNode0() and contact.getNode0().getPythonTag("owner"):
+                    if contact.getNode1() and contact.getNode1().getPythonTag("owner"):
                         # Notify both objects about the collision
-                        contact.getNode0().getPythonTag("owner").collision(self.game_objects[id])
-                        self.game_objects[id].collision(contact.getNode0().getPythonTag("owner"))
+                        contact.getNode1().getPythonTag("owner").collision(self.game_objects[id])
+                        self.game_objects[id].collision(contact.getNode1().getPythonTag("owner"))
+
+        self.physics_world.doPhysics(dt)
 
     def load_world(self):
         self.create_object([3, 0, 0], "crate", (5, 2, 1), 10, GameObject)
+        self.create_object([-3, 0, -4], "teleporter", (1, 1, 1), 0, Teleporter)
         player = self.create_object([0, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
         player.is_collision_source = True
         self.create_object([0, 0, -5], "crate", (1000, 1000, 0.5), 0, GameObject)

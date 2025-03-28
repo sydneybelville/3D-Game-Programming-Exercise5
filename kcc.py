@@ -51,8 +51,9 @@ class PandaBulletCharacterController:
         self.__mapMethods()
 
         # Attempt to use a ghost node to detect collisions
-        self.__walkGhost.setPythonTag("owner", self.game_object)
-        self.game_object.physics = self.__walkGhost
+        self.__walkCapsuleNP.node().setPythonTag("owner", self.game_object)
+        self.__crouchCapsuleNP.node().setPythonTag("owner", self.game_object)
+        self.game_object.physics = self.__walkCapsuleNP.node()
 
         self.gravity = self.__world.getGravity().z if gravity is None else gravity
         self.setMaxSlope(50.0, True)
