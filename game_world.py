@@ -2,6 +2,7 @@ from panda3d.bullet import BulletWorld, BulletBoxShape, BulletRigidBodyNode, Bul
     BulletCharacterControllerNode, BulletDebugNode
 from panda3d.core import Vec3, TransformState, VBase3, Point3
 from pubsub import pub
+import json
 from game_object import GameObject
 from player import Player
 from teleporter import Teleporter
@@ -22,6 +23,12 @@ class GameWorld:
             "floor": self.create_box,
             "red box": self.create_box,
             "teleporter": self.create_box,
+        }
+
+        self.class_to_type = {
+            'GameObject': GameObject,
+            'Teleporter': Teleporter,
+            'Player': Player,
         }
 
     def create_capsule(self, position, size, kind, mass):
@@ -87,12 +94,21 @@ class GameWorld:
 
         self.physics_world.doPhysics(dt)
 
-    def load_world(self):
-        self.create_object([3, 0, 0], "crate", (5, 2, 1), 10, GameObject)
-        self.create_object([-3, 0, -4], "teleporter", (1, 1, 1), 0, Teleporter)
-        player = self.create_object([0, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
-        player.is_collision_source = True
-        self.create_object([0, 0, -5], "crate", (1000, 1000, 0.5), 0, GameObject)
+    def load_world(self, filename):
+        # TODO: Need to do something here to remove old game objects and their views
+
+        with open(filename) as infile:
+            level_data = json.load(infile)
+            if not "objects" in level_data:
+                return False
+            for game_object in level_data['objects']:
+                collision_source = False
+                if 'collision_source' in game_object:
+                    collision_source = game_object['collision_source']
+
+                class_object = self.class_to_type[game_object['class']]
+                obj = self.create_object(game_object['position'], game_object['kind'], game_object['size'], game_object['mass'], class_object)
+                obj.is_collision_source = collision_source
 
     def get_property(self, key):
         if key in self.properties:
