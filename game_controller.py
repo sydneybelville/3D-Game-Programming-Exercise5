@@ -7,7 +7,6 @@ from panda3d.core import CollisionNode, GeomNode, CollisionRay, CollisionHandler
 from direct.showbase.InputStateGlobal import inputState
 from pubsub import pub
 import sys
-
 from kcc import PandaBulletCharacterController
 from world_view import WorldView
 from game_world import GameWorld
@@ -24,6 +23,7 @@ held_keys = {
     's': 'moveBackward',
     'a': 'moveLeft',
     'd': 'moveRight',
+    'control': 'crouch',
 }
 
 class Main(ShowBase):
@@ -149,7 +149,7 @@ class Main(ShowBase):
 
     def move_player(self, events=None):
         speed = Vec3(0, 0, 0)
-        delta = 5.0
+        delta = 7.0
 
         if inputState.isSet('moveForward'):
             speed.setY(delta)
@@ -165,6 +165,9 @@ class Main(ShowBase):
 
         if 'jump' in events:
             self.player.startJump(2)
+
+        if inputState.isSet('crouch'):
+            self.player.startCrouch()
 
         self.player.setLinearMovement(speed)
 

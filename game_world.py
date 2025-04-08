@@ -20,8 +20,7 @@ class GameWorld:
         self.kind_to_shape = {
             "crate": self.create_box,
             "floor": self.create_box,
-            "red box": self.create_box,
-            "teleporter": self.create_box,
+            "wall": self.create_box,
         }
 
     def create_capsule(self, position, size, kind, mass):
@@ -88,11 +87,26 @@ class GameWorld:
         self.physics_world.doPhysics(dt)
 
     def load_world(self):
-        self.create_object([3, 0, 0], "crate", (5, 2, 1), 10, GameObject)
-        self.create_object([-3, 0, -4], "teleporter", (1, 1, 1), 0, Teleporter)
-        player = self.create_object([0, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
+        # crates for the floor to be jumped over
+        self.create_object([3, 0, 0.75], "crate", (5, 2, 1), 0, GameObject)
+        self.create_object([3, 20, 0.75], "crate", (5, 2, 1), 0, GameObject)
+        self.create_object([3, 40, 0.75], "crate", (5, 2, 1), 0, GameObject)
+        self.create_object([3, 60, 0.75], "crate", (5, 2, 1), 0, GameObject)
+
+        # crates for the sky to be crawled under
+        self.create_object([3, 10, 1.4], "crate", (5, 2, 1), 0, GameObject)
+        self.create_object([3, 30, 1.4], "crate", (5, 2, 1), 0, GameObject)
+        self.create_object([3, 50, 1.4], "crate", (5, 2, 1), 0, GameObject)
+
+        # walls to surround the obstacle course
+        self.create_object([9, 15, 1], "wall", (2, 120, 10), 0, GameObject)
+        self.create_object([-4, 15, 1], "wall", (2, 120, 10), 0, GameObject)
+        self.create_object([3, 70, 1], "wall", (20, 6, 10), 0, GameObject)
+        self.create_object([3, -40, 1], "wall", (20, 6, 10), 0, GameObject)
+
+        player = self.create_object([3, -20, 0], "player", (1, 0.5, 0.25, 0.5), 10, Player)
         player.is_collision_source = True
-        self.create_object([0, 0, -5], "crate", (1000, 1000, 0.5), 0, GameObject)
+        self.create_object([0, 0, 0], "floor", (1000, 1000, 0.5), 0, GameObject)
 
     def get_property(self, key):
         if key in self.properties:

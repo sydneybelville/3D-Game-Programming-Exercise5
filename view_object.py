@@ -19,8 +19,15 @@ class ViewObject:
         # TODO: we don't always need a texture.  We need a
         # mechanism to see if we need a texture or color,
         # and what texture/color to use.
-        self.cube_texture = base.loader.loadTexture("Textures/crate.png")
-        self.cube.setTexture(self.cube_texture)
+        if self.game_object.kind == "crate":
+            self.cube_texture = base.loader.loadTexture("Textures/crate.png")
+            self.cube.setTexture(self.cube_texture)
+        elif self.game_object.kind == "floor":
+            self.cube_texture = base.loader.loadTexture("Textures/grass.png")
+            self.cube.setTexture(self.cube_texture)
+        elif self.game_object.kind == "wall":
+            self.cube_texture = base.loader.loadTexture("Textures/blocks1.png")
+            self.cube.setTexture(self.cube_texture)
 
         bounds = self.cube.getTightBounds()
         # bounds is two vectors
