@@ -30,7 +30,7 @@ class Main(ShowBase):
     def go(self):
         self.cTrav = CollisionTraverser()
 
-        self.game_world.load_world()
+        self.game_world.load_world("levels/level1.json")
         self.player = PandaBulletCharacterController(self.game_world.physics_world, self.render, self.player)
 
         self.taskMgr.add(self.tick)
