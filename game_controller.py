@@ -162,8 +162,11 @@ class Main(ShowBase):
         if inputState.isSet('moveRight'):
             speed.setX(delta)
 
-        if 'jump' in events:
-            self.player.startJump(2)
+        if 'jump' in events and not self.player.isCrouching:
+            # self.player.startJump(2)
+            self.player.startCrouch()
+        elif 'jump' not in events and self.player.isCrouching:
+            self.player.stopCrouch()
 
         self.player.setLinearMovement(speed)
 
