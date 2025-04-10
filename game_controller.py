@@ -166,8 +166,11 @@ class Main(ShowBase):
         if 'jump' in events:
             self.player.startJump(2)
 
-        if inputState.isSet('crouch'):
+        if inputState.isSet('crouch') and not self.player.isCrouching:
+            # self.player.startJump(2)
             self.player.startCrouch()
+        elif not inputState.isSet('crouch') and self.player.isCrouching:
+            self.player.stopCrouch()
 
         self.player.setLinearMovement(speed)
 
