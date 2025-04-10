@@ -126,7 +126,10 @@ class Main(ShowBase):
         delta_z = -forward[2]
         x, y, z = self.player.getPos()
         distance_factor = 0.5
-        z_adjust = self.player.game_object.size[0]
+        if self.player.isCrouching:
+            z_adjust = self.player.game_object.size[1]
+        else:
+            z_adjust = self.player.game_object.size[0]
         # self.camera.set_pos(x + delta_x*distance_factor, y + delta_y*distance_factor, z + z_adjust)
         self.camera.set_pos(x, y, z + z_adjust)
 
@@ -163,8 +166,11 @@ class Main(ShowBase):
         if inputState.isSet('moveRight'):
             speed.setX(delta)
 
-        if 'jump' in events:
-            self.player.startJump(2)
+        if inputState.isSet('crouch') and not self.player.isCrouching:
+            # self.player.startJump(2)
+            self.player.startCrouch()
+        elif not inputState.isSet('crouch')  and self.player.isCrouching:
+            self.player.stopCrouch()
 
         if inputState.isSet('crouch'):
             self.player.startCrouch()
